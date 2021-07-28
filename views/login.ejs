@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id" content="YOUR_GOOGLE_CLIENT_ID" />
+    <title>Login</title>
+  </head>
+  <body>
+    <h1>Welcome to Login Page</h1>
+
+    <!--Google Buttons-->
+
+    <div
+      style="width: 70px; height: 25px"
+      class="g-signin2"
+      data-onsuccess="onSignIn"
+    ></div>
+    <br />
+
+    <div id="status"></div>
+
+    <!--After getting signed in displays user profile-->
+    <script>
+      function onSignIn(googleUser) {
+        var id_token = googleUser.getAuthResponse().id_token;
+
+        // send id token to backend
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/login");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onload = function () {
+          console.log("Signed in as: " + xhr.responseText);
+          if (xhr.responseText == "success") {
+            // since we are sending success in cookie
+            signOut();
+            location.assign("/dashboard");
+          }
+        };
+        xhr.send(JSON.stringify({ token: id_token }));
+      }
+    </script>
+
+    <script>
+      function signOut() {
+        var auth2 = gapi.auth2.getAuthInstance();
+        auth2.signOut().then(function () {
+          console.log("User signed out.");
+        });
+      }
+    </script>
+  </body>
+</html>
